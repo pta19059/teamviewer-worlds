@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'
 $repoOwner = 'pta19059'
 $repoName = 'teamviewer-worlds'
 $repo = "$repoOwner/$repoName"
