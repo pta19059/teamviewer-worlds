@@ -58,9 +58,6 @@ function capSpots(parent,cx,cy,cz,rx,ry,rz) {
   }
 }
 function sign(parent, text, x, y, z, color = '#175cc8', width = 6) {
-  // Retire the former recessed hub sign; the forward sign below is the single
-  // readable welcome label.
-  if (text.includes('CONNECT') && z < 0) return new THREE.Group();
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(width, width / 4), new THREE.MeshBasicMaterial({ map: labelTexture(text, color, '#ffffff'), transparent: true, side: THREE.DoubleSide }));
   plane.position.set(x, y, z); parent.add(plane); return plane;
 }
@@ -150,7 +147,6 @@ function island(id) {
     const welcomeSign = sign(g, 'LET’S CONNECT', 0, 3.05, .95, '#886943', 3.7);
     welcomeSign.renderOrder = 2;
     [-1, 1].forEach(s => { const win = ring(g, '#b9d7ff', .48, .11, s * 1.65, 2.9, -.78); win.rotation.y = s * .38; ball(g, '#86c5f5', s * 1.65, 2.9, -.78, .45, .45, .11); });
-    sign(g, 'LET’S CONNECT', 0, 3.4, -.18, '#886943', 3.3);
     tree(g, -8, 2, 1.3); tree(g, 7, 6, .8); tree(g, -6, -7, .7);
     tree(g, 7, -6, 1.4); tree(g, -8, -4, 1.2); tree(g, 3, -9, .95);
     for (const [x,z] of [[-9,7],[-4,9],[8,8],[10,-4],[-10,-6]]) flower(g,x,z,'#f5a4c8');
