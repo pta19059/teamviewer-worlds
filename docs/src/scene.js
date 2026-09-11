@@ -29,11 +29,16 @@ function ring(parent, color, radius, tube, x, y, z) {
   return mesh(new THREE.TorusGeometry(radius, tube, 10, 64), color, parent, x, y, z);
 }
 function labelTexture(text, color = '#fff', background = null, size = 64) {
-  const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 128;
+  // Render signage at 4× its displayed size so it stays crisp from the orbit camera.
+  const pixelRatio = 4;
+  const canvas = document.createElement('canvas'); canvas.width = 512 * pixelRatio; canvas.height = 128 * pixelRatio;
   const ctx = canvas.getContext('2d');
+  ctx.scale(pixelRatio, pixelRatio);
   if (background) { ctx.fillStyle = background; ctx.beginPath(); ctx.roundRect(0, 0, 512, 128, 28); ctx.fill(); }
-  ctx.font = `800 ${size}px Arial`; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 256, 68);
+  ctx.font = `800 ${size}px Outfit, Arial, sans-serif`; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 256, 68);
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter; texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = 8;
   return texture;
 }
 function glyphTexture(text, color = '#fff') {
