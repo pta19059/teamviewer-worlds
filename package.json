@@ -1,0 +1,13 @@
+{
+  "name": "teamviewer-worlds",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/server.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/server.mjs --dist",
+    "test": "node --test --test-isolation=none tests/*.test.js"
+  },
+  "engines": { "node": ">=22" }
+}
