@@ -29,13 +29,16 @@ function ring(parent, color, radius, tube, x, y, z) {
   return mesh(new THREE.TorusGeometry(radius, tube, 10, 64), color, parent, x, y, z);
 }
 function labelTexture(text, color = '#fff', background = null, size = 64) {
+  // Some static hosts can preserve a mojibake apostrophe from an older build.
+  // Normalize it at render time so every existing sign displays plain text.
+  const printableText = text.replace(/\u00e2\u20ac\u2122/g, "'");
   // Render signage at 4× its displayed size so it stays crisp from the orbit camera.
   const pixelRatio = 4;
   const canvas = document.createElement('canvas'); canvas.width = 512 * pixelRatio; canvas.height = 128 * pixelRatio;
   const ctx = canvas.getContext('2d');
   ctx.scale(pixelRatio, pixelRatio);
   if (background) { ctx.fillStyle = background; ctx.beginPath(); ctx.roundRect(0, 0, 512, 128, 28); ctx.fill(); }
-  ctx.font = `800 ${size}px Outfit, Arial, sans-serif`; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 256, 68);
+  ctx.font = `800 ${size}px Outfit, Arial, sans-serif`; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(printableText, 256, 68);
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
   texture.minFilter = THREE.LinearMipmapLinearFilter; texture.magFilter = THREE.LinearFilter;
   texture.anisotropy = 8;
@@ -140,6 +143,9 @@ function island(id) {
     cylinder(g, '#bed7ff', 0, 4.52, -3, 4.15, 4.1, .25);
     box(g, '#4d7fe5', 0, 1.05, -.2, 1.3, 2.1, .18, .6);
     ball(g, '#b6f0e3', .38, 1.03, -.08, .08);
+    // Keep the welcome sign beyond the roof's footprint so it is legible from the player camera.
+    const welcomeSign = sign(g, 'LET’S CONNECT', 0, 3.05, .95, '#886943', 3.7);
+    welcomeSign.renderOrder = 2;
     [-1, 1].forEach(s => { const win = ring(g, '#b9d7ff', .48, .11, s * 1.65, 2.9, -.78); win.rotation.y = s * .38; ball(g, '#86c5f5', s * 1.65, 2.9, -.78, .45, .45, .11); });
     sign(g, 'LET’S CONNECT', 0, 3.4, -.18, '#886943', 3.3);
     tree(g, -8, 2, 1.3); tree(g, 7, 6, .8); tree(g, -6, -7, .7);
