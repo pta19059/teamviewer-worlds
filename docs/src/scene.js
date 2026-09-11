@@ -58,6 +58,9 @@ function capSpots(parent,cx,cy,cz,rx,ry,rz) {
   }
 }
 function sign(parent, text, x, y, z, color = '#175cc8', width = 6) {
+  // Retire the former recessed hub sign; the forward sign below is the single
+  // readable welcome label.
+  if (text.includes('CONNECT') && z < 0) return new THREE.Group();
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(width, width / 4), new THREE.MeshBasicMaterial({ map: labelTexture(text, color, '#ffffff'), transparent: true, side: THREE.DoubleSide }));
   plane.position.set(x, y, z); parent.add(plane); return plane;
 }
