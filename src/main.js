@@ -149,7 +149,7 @@ updateProgress();
 
 async function init() {
   try {
-    const { WorldScene } = await import('./scene.js');
+    const { WorldScene } = await import('./scene.js?v=welcome-sign-3');
     scene=new WorldScene($('scene'),{travel,discover,near:showNear,sound,position:updateMinimap,labels:updateWorldLabels},progress);
     $('start').innerHTML=`Start exploring <span class="button-arrow">${icon('arrow-right')}</span>`;$('start').disabled=false;
     document.querySelectorAll('[data-travel]').forEach(el=>el.disabled=false);document.body.classList.add('loaded');
