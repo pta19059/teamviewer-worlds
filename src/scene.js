@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { WORLDS, DISCOVERIES, clampToIsland } from './data.js';
 import { OBSTACLES, findRoute } from './navigation.js';
-import { addLandscape } from './landscape.js';
+import { addLandscape } from './landscape.js?v=fantasy-landscapes-2';
 
 const TAU = Math.PI * 2;
 const materials = new Map();

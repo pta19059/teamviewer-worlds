@@ -3,6 +3,7 @@ import { connectBrowser } from './browser-qa.mjs';
 
 const browser = await connectBrowser();
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+const targetUrl = process.argv[2] || 'http://localhost:5173';
 try {
   await browser.send('Page.addScriptToEvaluateOnNewDocument', { source: `
     window.landscapeRenderErrors = [];
@@ -10,8 +11,16 @@ try {
     console.error = (...args) => { window.landscapeRenderErrors.push(args.map(String).join(' ')); reportError(...args); };
   ` });
   await browser.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
-  await browser.send('Page.navigate', { url: 'http://localhost:5173' });
+  await browser.send('Page.navigate', { url: targetUrl });
   await browser.until(`document.body.classList.contains('loaded')`, 30000);
+  // Check the modules actually requested by the page, including its lazy import.
+  // A fresh entry point must not reuse a previous release's cached 3D scene.
+  const modules = await browser.evaluate(`performance.getEntriesByType('resource')
+    .map(resource => new URL(resource.name)).filter(url => /\\/src\\/(main|scene|landscape)\\.js$/.test(url.pathname))
+    .map(url => ({ path: url.pathname, version: url.searchParams.get('v') }))`);
+  assert.equal(modules.length, 3, 'The page loads the entry point, scene and landscape modules');
+  assert.ok(modules.every(module => module.version && module.version === modules[0].version), 'All landscape modules use the same cache version');
+  console.log('PASS the browser loads all three current-release modules', JSON.stringify(modules));
   await wait(1500);
   await browser.screenshot('landscape-map.png');
   for (const world of ['hub', 'tensor', 'one']) {
