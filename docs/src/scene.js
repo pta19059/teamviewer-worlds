@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { WORLDS, DISCOVERIES, clampToIsland } from './data.js';
 import { OBSTACLES, findRoute } from './navigation.js';
+import { addLandscape } from './landscape.js';
 
 const TAU = Math.PI * 2;
 const materials = new Map();
@@ -124,7 +125,7 @@ function createTia() {
 function island(id) {
   const w = WORLDS[id], g = new THREE.Group(), r = w.radius;
   g.position.fromArray(w.center); g.userData.world = id;
-  const surface = id === 'tensor' ? '#e0effb' : id === 'one' ? '#8ddaaf' : '#ace278';
+  const surface = id === 'tensor' ? '#d0e5f3' : id === 'one' ? '#78c8a0' : '#91cf64';
   cylinder(g, id === 'tensor' ? '#779ac5' : '#b99168', 0, -2.7, 0, r * .96, r * .67, 5, 12);
   cylinder(g, id === 'tensor' ? '#a8c6e0' : '#d5b58b', 0, -.95, 0, r, r * .96, 1.5, 48);
   cylinder(g, surface, 0, -.12, 0, r, r, .4, 64);
@@ -198,7 +199,7 @@ function island(id) {
 export class WorldScene {
   constructor(container, callbacks, collected) {
     this.container = container; this.callbacks = callbacks; this.collected = new Set(collected);
-    this.orbitYaw=Math.atan2(13,30);this.orbitPitch=.613;this.orbitDistance=41.5;
+    this.orbitYaw=Math.atan2(13,30);this.orbitPitch=.613;this.orbitDistance=52;
     this.mapOrbitYaw=Math.atan2(23,90);this.mapOrbitPitch=Math.asin(44/Math.hypot(23,44,90));this.mapOrbitDistance=Math.hypot(23,44,90);this.drag=null;
     this.active = 'map'; this.keys = new Set(); this.stations = []; this.portals = []; this.clouds = []; this.particles = []; this.elapsed = 0; this.paused = false; this.jumpY = 0; this.velocityY = 0; this.moveTarget = null; this.waypoints = []; this.pendingStation = null; this.nearest = null; this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.scene = new THREE.Scene();
@@ -215,8 +216,11 @@ export class WorldScene {
     this.scene.add(new THREE.HemisphereLight('#e5f4ff', '#a0a6bc', 1.8));
     const sun = new THREE.DirectionalLight('#fff1d9', 2.8); sun.position.set(-28, 65, 35); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left=-70; sun.shadow.camera.right=70; sun.shadow.camera.top=55; sun.shadow.camera.bottom=-55; sun.shadow.normalBias=.05; sun.shadow.bias=-.0003; this.scene.add(sun);
     const fill = new THREE.DirectionalLight('#b9dcff', .8); fill.position.set(35,20,-45); this.scene.add(fill);
-    this.worldGroups = {};
-    Object.keys(WORLDS).forEach(id => { const g = island(id); this.scene.add(g); this.worldGroups[id] = g; });
+    this.worldGroups = {}; this.landscapes = [];
+    Object.keys(WORLDS).forEach(id => {
+      const g = island(id); this.scene.add(g); this.worldGroups[id] = g;
+      this.landscapes.push(addLandscape(g, id));
+    });
     this.tia = createTia(); this.tia.group.traverse(o=>{o.castShadow=false;}); this.tia.group.scale.setScalar(1.15); this.tia.group.position.set(1, .15, 5); this.tia.group.rotation.y = .15; this.scene.add(this.tia.group);
     this.shadow = new THREE.Mesh(new THREE.CircleGeometry(.72, 24), new THREE.MeshBasicMaterial({color:'#2c5460',opacity:.14,transparent:true,depthWrite:false})); this.shadow.rotation.x=-Math.PI/2; this.scene.add(this.shadow);
     DISCOVERIES.forEach((data,i) => {
@@ -287,7 +291,7 @@ export class WorldScene {
     this.active=id;this.moveTarget=null;this.waypoints=[];this.pendingStation=null;this.keys.clear();this.jumpY=0;this.velocityY=0;
     const w=WORLDS[id]; this.tia.group.position.set(w.center[0]+w.spawn[0],w.center[1]+.15,w.center[2]+w.spawn[1]);this.tia.group.rotation.y=Math.PI;
     Object.entries(this.worldGroups).forEach(([key,g])=>{g.visible=key===id;});
-    this.orbitYaw=Math.atan2(13,30);this.orbitPitch=.613;this.orbitDistance=Math.max(41.5,w.radius*2.85);this.renderer.domElement.style.touchAction='none';
+    this.orbitYaw=Math.atan2(13,30);this.orbitPitch=.613;this.orbitDistance=Math.max(52,w.radius*3.25);this.renderer.domElement.style.touchAction='none';
     this.renderer.shadowMap.needsUpdate=true;
     this.nearest=null;this.callbacks.near(null);this.resize();
   }
@@ -376,6 +380,7 @@ export class WorldScene {
   animate(now) {
     this.raf=requestAnimationFrame(this.animate);const dt=Math.min((now-this.previous)/1000,.045);this.previous=now;if(document.hidden)return;this.elapsed+=dt;
     const t=this.elapsed;
+    for (const landscape of this.landscapes) landscape.update(t, this.reduced);
     if(this.active!=='map'&&!this.paused)this.move(dt);else this.animateTia(false,t);
     let desiredPos,desiredTarget;
     if(this.active==='map'){
@@ -386,7 +391,7 @@ export class WorldScene {
       this.scene.fog.near=100;this.scene.fog.far=235;
       const p=this.tia.group.position,c=WORLDS[this.active].center;
       desiredTarget=new THREE.Vector3(c[0]*.78+p.x*.22,c[1]+1.2,c[2]*.78+p.z*.22-1.7);
-      const zoom=this.camera.aspect<.9?1.35:1,d=this.orbitDistance*zoom,flat=d*Math.cos(this.orbitPitch);desiredPos=desiredTarget.clone().add(new THREE.Vector3(Math.sin(this.orbitYaw)*flat,Math.sin(this.orbitPitch)*d,Math.cos(this.orbitYaw)*flat));
+      const zoom=this.camera.aspect<.9?1.65:1,d=this.orbitDistance*zoom,flat=d*Math.cos(this.orbitPitch);desiredPos=desiredTarget.clone().add(new THREE.Vector3(Math.sin(this.orbitYaw)*flat,Math.sin(this.orbitPitch)*d,Math.cos(this.orbitYaw)*flat));
     }
     const lerp=this.reduced?1:1-Math.exp(-dt*3);this.camPos.lerp(desiredPos,lerp);this.camTarget.lerp(desiredTarget,lerp);this.camera.position.copy(this.camPos);this.camera.lookAt(this.camTarget);
     if(this.active==='map'&&this.callbacks.labels&&this.viewport){

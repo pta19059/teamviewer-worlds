@@ -57,7 +57,7 @@ test('The local server serves the complete site and rejects private or invalid p
   const server = createAppServer(); server.listen(0, '127.0.0.1'); await once(server, 'listening');
   const base = `http://127.0.0.1:${server.address().port}`;
   try {
-    for (const path of ['/', '/src/main.js', '/src/scene.js', '/src/navigation.js', '/src/style.css', '/vendor/three/three.module.js', '/vendor/three/three.core.js', '/vendor/three/addons/geometries/RoundedBoxGeometry.js', '/fonts/manrope-latin.woff2']) {
+    for (const path of ['/', '/src/main.js', '/src/scene.js', '/src/landscape.js', '/src/navigation.js', '/src/style.css', '/vendor/three/three.module.js', '/vendor/three/three.core.js', '/vendor/three/addons/geometries/RoundedBoxGeometry.js', '/fonts/manrope-latin.woff2']) {
       const response = await fetch(base + path); assert.equal(response.status, 200, path); assert.ok((await response.arrayBuffer()).byteLength > 0);
     }
     assert.equal((await fetch(base + '/.git/config')).status, 403);

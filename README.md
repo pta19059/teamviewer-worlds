@@ -61,6 +61,7 @@ The unit suite checks persistence recovery, unique progress, world boundaries, p
 ```powershell
 node scripts/verify-browser.mjs
 node scripts/verify-interactions.mjs
+node scripts/verify-landscapes.mjs
 ```
 
 Chrome is detected in the per-user Windows installation. Set `CHROME_PATH` to another Chrome executable if necessary. Screenshots and test results are written to `artifacts/`. The test browser uses its own profile and does not use your normal Chrome session.
@@ -68,6 +69,7 @@ Chrome is detected in the per-user Windows installation. Set `CHROME_PATH` to an
 ## Project structure
 
 - `src/scene.js`: procedural 3D models, lighting, animation, movement, portals, camera, picking.
+- `src/landscape.js`: batched landscape details, flower meadows, crystal ruins, floating islets, waterfalls, snow and fireflies. Each island has its own fantasy/platform palette; animated scenery respects reduced motion.
 - `src/navigation.js`: obstacle-aware routes for click-to-walk.
 - `src/data.js`: worlds, product content, source links, progress validation.
 - `src/main.js`: interface, dialogs, journal, audio, travel, persistence.
