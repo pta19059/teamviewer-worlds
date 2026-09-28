@@ -20,9 +20,9 @@ app.innerHTML = `
     <div class="sky-grain" aria-hidden="true"></div>
     <div id="scene" class="scene-wrap"></div>
     <section class="hero" id="hero" aria-labelledby="hero-title">
-      <div class="eyebrow"><span class="live-dot"></span> SMALL HERO. BIG CONNECTIONS.</div>
-      <h1 id="hero-title">A little hero.<br>A whole world of<br><span>possibilities.</span><svg class="title-spark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 2v12m0 20v12M2 24h12m20 0h12M8 8l9 9m14 14 9 9M8 40l9-9M31 17l9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h1>
-      <p>Follow TIA beyond the familiar.<br>Explore the TeamViewer worlds and discover<br>what a great connection can do.</p>
+      <div class="eyebrow"><span class="live-dot"></span> THREE CHAPTERS · ONE ADVENTURE</div>
+      <h1 id="hero-title">A little hero.<br>Three worlds of<br><span>possibility.</span><svg class="title-spark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 2v12m0 20v12M2 24h12m20 0h12M8 8l9 9m14 14 9 9M8 40l9-9M31 17l9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h1>
+      <p>Follow TIA through a handmade world.<br>Choose a chapter, find its discoveries,<br>and make your way to the next.</p>
       <button class="primary-button start-button" id="start" disabled>Getting your world ready… <span class="button-arrow">${icon('arrow-right')}</span></button>
       <div class="hero-note">${icon('gamepad-2')} A 3D adventure. Your next discovery.</div>
       <div class="hero-bottom"><span class="mini-avatar"><img src="./assets/tia-mascot.png" alt="TIA" /></span><span>YOUR EXPLORER<br><strong>TIA is ready. Are you?</strong></span><span class="tiny-stars">✦<br>✧</span></div>
@@ -38,6 +38,7 @@ app.innerHTML = `
       </div>
     </section>
     <section class="explore-hud hidden" id="explore-hud" aria-label="Exploration">
+      <div class="chapter-steps" aria-label="Journey steps"><span class="step-done">01 Choose</span><span class="step-current">02 Explore</span><span id="step-collect">03 Collect</span><span id="step-continue">04 Continue</span></div>
       <div class="world-info"><button class="back-map" id="back-map">${icon('arrow-left')} All worlds</button><div class="world-kicker" id="world-kicker"></div><h1 id="world-title"></h1><p id="world-tagline"></p><div id="world-progress"></div></div>
       <aside class="quest-card" id="quest-card"><div class="quest-heading">${icon('flag')} YOUR MISSION</div><strong id="quest-title"></strong><p id="quest-description"></p><div class="quest-track" id="quest-track"></div><button class="text-button" id="next-discovery">Find my next discovery ${icon('arrow-right')}</button></aside>
       <div class="minimap" id="minimap" aria-label="Island map"><div class="minimap-top"><span>YOUR ISLAND</span>${icon('compass')}</div><div class="minimap-island" id="minimap-island"><span class="minimap-building"></span><span class="minimap-player" id="minimap-player"></span></div><span class="minimap-legend"><i></i> TIA <i></i> Discovery</span></div>
@@ -71,9 +72,13 @@ function updateProgress() {
   const isHub=currentWorld==='hub',count=worldProgress(progress,currentWorld);
   $('world-progress').innerHTML=isHub?`<span class="world-pill">${icon('compass')} Two portals. Choose your horizon.</span>`:`<span class="world-pill">${icon('star')} ${count} of 6 discoveries collected</span>`;
   $('quest-title').textContent=isHub?'Your adventure starts here.':count===6?'World complete!':'Follow your curiosity.';
-  $('quest-description').textContent=isHub?'Walk to a glowing portal and press E to enter a new world.':count===6?'You found every discovery on this island. Another world is waiting.':'Find the golden blocks. Each one holds a new possibility.';
+  $('quest-description').textContent=isHub?'Walk to a glowing portal and press E to enter a new world.':progress.length===12?'All twelve discoveries are in your journey journal.':count===6?'You found every discovery on this island. Another world is waiting.':'Find the golden blocks. Each one holds a new possibility.';
   $('quest-track').innerHTML=isHub?`<span class="portal-chip tensor-chip">${icon('shield-check')} Tensor</span><span class="portal-chip one-chip">${icon('sparkles')} ONE</span>`:Array.from({length:6},(_,i)=>`<span class="quest-star ${i<count?'collected':''}">${icon('star')}</span>`).join('');
-  $('next-discovery').innerHTML=isHub?`Visit Tensor ${icon('arrow-right')}`:count===6?`Explore the other world ${icon('arrow-right')}`:`Find my next discovery ${icon('arrow-right')}`;
+  const nextWorld=['tensor','one'].find(id=>worldProgress(progress,id)<6);
+  $('next-discovery').innerHTML=!nextWorld?`View your journey ${icon('arrow-right')}`:isHub?`Visit ${WORLDS[nextWorld].name} ${icon('arrow-right')}`:count===6?`Explore ${WORLDS[nextWorld].name} ${icon('arrow-right')}`:`Find my next discovery ${icon('arrow-right')}`;
+  $('step-collect').classList.toggle('step-done',count>0);
+  $('step-continue').classList.toggle('step-current',count===6);
+  $('step-continue').classList.toggle('step-done',count===6);
   document.querySelectorAll('.minimap-point').forEach(el=>el.classList.toggle('found',progress.includes(el.dataset.discovery)));
 }
 function updateMinimap(x,z) {const el=$('minimap-player');el.style.left=`${50+x/30*100}%`;el.style.top=`${50+z/30*100}%`;}
@@ -107,7 +112,7 @@ function openDialog(html,wide=false) {
   if(!$('dialog').open)$('dialog').showModal();$('dialog-close').focus();
 }
 function closeDialog() { if($('dialog').open)$('dialog').close(); }
-$('dialog').addEventListener('close',()=>{scene?.setPaused(false);activeDiscovery=null;if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});});
+$('dialog').addEventListener('close',()=>{scene?.setPaused(false);activeDiscovery=null;const returnToWorld=currentWorld!=='map'&&(lastFocus===scene?.renderer.domElement||lastFocus?.matches?.('.minimap-point'));if(returnToWorld)scene.renderer.domElement.focus({preventScroll:true});else if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});});
 $('dialog').addEventListener('click',e=>{if(e.target===$('dialog')){const r=$('dialog').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog();}});
 $('dialog-close').onclick=closeDialog;
 function discover(data,fromJournal=false) {
@@ -140,7 +145,7 @@ $('start').onclick=()=>travel('hub');document.querySelectorAll('[data-travel]').
 $('brand').onclick=showMap;$('nav-map').onclick=showMap;$('back-map').onclick=showMap;
 $('nav-journal').onclick=journal;$('progress-button').onclick=journal;$('fallback-journal').onclick=journal;$('nav-guide').onclick=guide;$('sources').onclick=sources;
 $('interaction').onclick=()=>scene?.interact();$('touch-jump').onclick=()=>scene?.jump();$('retry').onclick=()=>location.reload();
-$('next-discovery').onclick=()=>{if(currentWorld==='hub'){travel('tensor');return;}const next=DISCOVERIES.find(d=>d.world===currentWorld&&!progress.includes(d.id));if(next){scene.walkTo(next);toast('Follow TIA to the next discovery.');}else travel(currentWorld==='tensor'?'one':'tensor');};
+$('next-discovery').onclick=()=>{const next=DISCOVERIES.find(d=>d.world===currentWorld&&!progress.includes(d.id));if(next){scene.walkTo(next);toast('Follow TIA to the next discovery.');return;}const nextWorld=['tensor','one'].find(id=>worldProgress(progress,id)<6);if(nextWorld)travel(nextWorld);else journal();};
 $('sound').onclick=()=>{soundEnabled=!soundEnabled;$('sound').innerHTML=icon(soundEnabled?'volume-2':'volume-x');$('sound').setAttribute('aria-label',soundEnabled?'Mute sound':'Enable sound');$('sound').title=soundEnabled?'Mute sound':'Enable sound';if(soundEnabled)sound('collect');};
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('Full screen is unavailable in this browser.');}};
 document.querySelectorAll('[data-key]').forEach(button=>{const release=()=>scene?.keys.delete(button.dataset.key);button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);scene?.keys.add(button.dataset.key);};button.onpointerup=release;button.onpointercancel=release;button.onlostpointercapture=release;});
@@ -149,7 +154,7 @@ updateProgress();
 
 async function init() {
   try {
-    const { WorldScene } = await import('./scene.js?v=fantasy-landscapes-2');
+    const { WorldScene } = await import('./scene.js?v=clay-worlds-1');
     scene=new WorldScene($('scene'),{travel,discover,near:showNear,sound,position:updateMinimap,labels:updateWorldLabels},progress);
     $('start').innerHTML=`Start exploring <span class="button-arrow">${icon('arrow-right')}</span>`;$('start').disabled=false;
     document.querySelectorAll('[data-travel]').forEach(el=>el.disabled=false);document.body.classList.add('loaded');

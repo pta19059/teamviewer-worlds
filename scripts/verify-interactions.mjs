@@ -6,13 +6,13 @@ try{
   await b.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
   await b.send('Page.navigate',{url:'http://localhost:5173'});await b.until(`document.body.classList.contains('loaded')`,25000);
   await b.click('#start');await b.until(`document.body.dataset.world==='hub' && document.getElementById('transition').classList.contains('hidden')`);await wait(2400);
-  // Portal center observed in the 1440 Ã— 1000 Connection Island screenshot.
-  await at(434,547);await b.until(`document.body.dataset.world==='tensor' && document.getElementById('transition').classList.contains('hidden')`,45000);
+  // Portal center observed in the current 1440 × 1000 Connection Island screenshot.
+  await at(492,545);await b.until(`document.body.dataset.world==='tensor' && document.getElementById('transition').classList.contains('hidden')`,45000);
   console.log('PASS Clicking the physical Tensor portal walks TIA through it');
   await b.click('[data-discovery="tensor-connect"]');await b.until(`document.querySelector('dialog').open`,30000);await b.click('#dialog-close');await wait(200);
   const before=await b.evaluate(`document.getElementById('minimap-player').style.cssText`);
-  await b.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowLeft',code:'ArrowLeft',windowsVirtualKeyCode:37});await wait(700);
-  await b.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowLeft',code:'ArrowLeft',windowsVirtualKeyCode:37});
+  await b.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});await wait(700);
+  await b.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
   assert.notEqual(before,await b.evaluate(`document.getElementById('minimap-player').style.cssText`));
   console.log('PASS Keyboard movement works after closing a discovery dialog');
   await b.send('Input.dispatchMouseEvent',{type:'mousePressed',x:1050,y:630,button:'left',clickCount:1});

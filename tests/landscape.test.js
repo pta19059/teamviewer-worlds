@@ -38,7 +38,7 @@ for (const id of Object.keys(WORLDS)) {
     });
     assert.ok(instances > 650, 'The island includes dense scenery');
     assert.ok(meshes < 100, `Scenery is batched: ${meshes} draws for ${instances} details`);
-    assert.equal(waterfalls, id === 'one' ? 2 : 1);
+    assert.equal(waterfalls, 1, 'Every chapter uses the same waterfall layout');
   });
 
   test(`${id}: reduced motion freezes all landscape animation and hidden worlds skip updates`, () => {

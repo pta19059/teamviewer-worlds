@@ -1,6 +1,6 @@
 ﻿# TeamViewer Worlds
 
-An English-language, browser-native 3D adventure with a playable TIA character, three floating islands, and twelve collectible discoveries about TeamViewer Tensor and TeamViewer ONE.
+An English-language, browser-native 3D adventure with a playable TIA character, three floating islands, and twelve collectible discoveries about TeamViewer Tensor and TeamViewer ONE. The three chapters share one warm, tactile clay-inspired visual system and the same choose, explore, collect, continue flow.
 
 ## Run locally
 
@@ -69,7 +69,7 @@ Chrome is detected in the per-user Windows installation. Set `CHROME_PATH` to an
 ## Project structure
 
 - `src/scene.js`: procedural 3D models, lighting, animation, movement, portals, camera, picking.
-- `src/landscape.js`: batched landscape details, flower meadows, crystal ruins, floating islets, waterfalls, snow and fireflies. Each island has its own fantasy/platform palette; animated scenery respects reduced motion.
+- `src/landscape.js`: batched clay-style scenery, flower meadows, floating islets, and one waterfall per chapter. Each island uses the same terrain palette and landmarks; animated scenery respects reduced motion.
 - `src/navigation.js`: obstacle-aware routes for click-to-walk.
 - `src/data.js`: worlds, product content, source links, progress validation.
 - `src/main.js`: interface, dialogs, journal, audio, travel, persistence.

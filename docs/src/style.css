@@ -1,5 +1,5 @@
-@font-face{font-family:'DM Sans';font-style:normal;font-weight:400 700;font-display:swap;src:url('/fonts/dm-sans-latin.woff2') format('woff2')}
-@font-face{font-family:'Manrope';font-style:normal;font-weight:400 800;font-display:swap;src:url('/fonts/manrope-latin.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400 700;font-display:swap;src:url('../fonts/dm-sans-latin.woff2') format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:400 800;font-display:swap;src:url('../fonts/manrope-latin.woff2') format('woff2')}
 
 :root{font-family:'DM Sans',sans-serif;color:#172b48;background:#f5f8fc;font-synthesis:none;font-weight:400;--blue:#1761ee;--ink:#172b48;--muted:#78869a;--line:#dfe6ef;--world:#1761ee}
 *{box-sizing:border-box}body{margin:0;overflow-x:hidden}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer;color:inherit}button:disabled{cursor:wait;opacity:.6}button,a{touch-action:manipulation}button{border:0;background:none}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #1761ee;outline-offset:5px}button:focus:not(:focus-visible){outline:0}.hidden{display:none!important}.icon{width:21px;height:21px;flex:none;vertical-align:middle}.header{height:94px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dce4ee99;background:#f8fafd;position:relative;z-index:5}.brand{display:flex;align-items:center;gap:11px;padding:0;text-align:left;white-space:nowrap}.tv-mark{height:35px;width:35px;color:#1560f0}.brand>span{font-family:'Manrope',sans-serif;font-size:23px;font-weight:750;letter-spacing:-1.2px}.brand-worlds{font-weight:450;margin-left:9px;color:#8592a6;font-size:22px;letter-spacing:-.7px}.main-nav{display:flex;gap:36px;margin-left:32px;height:100%;align-items:center}.nav-link{font-size:13px;font-weight:600;position:relative;height:100%;color:#7d899a;padding:0 2px;display:flex;align-items:center;gap:7px}.nav-link .icon{width:14px;height:14px}.nav-link:hover{color:var(--blue)}.nav-link.active{color:#243d60}.nav-link.active:after{content:'';width:22px;height:3px;position:absolute;bottom:20px;left:calc(50% - 11px);border-radius:3px;background:var(--blue)}.nav-dot{width:5px;height:5px;border-radius:50%;background:#d5dce7}.nav-dot.has-progress{background:#edbb49}.header-progress{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:10px 17px;font-size:12px;color:#7b879b;box-shadow:0 2px 2px #223f6310}.header-progress .icon{color:#d9a941;fill:#f8e6b0;width:18px;height:18px}.header-progress b{color:#3d506d;font-size:13px}.header-progress span{margin-left:-5px}
@@ -43,3 +43,71 @@ main:before{right:7%;top:-160px}main:after{left:28%;bottom:-285px;animation-dela
 .mini-avatar{overflow:hidden;background:#fff;padding:2px;transform:none}.mini-avatar img{width:100%;height:100%;object-fit:contain;display:block}
 @keyframes drift-orbit{50%{transform:translate(35px,22px) rotate(18deg);opacity:.7}}@keyframes twinkle{50%{transform:rotate(18deg) scale(1.2);opacity:.7}}
 @media(max-width:800px){.world-selector{padding:8px;border-radius:17px}.hero h1{letter-spacing:-3px}}
+
+/* Shared clay storybook treatment for the title and every chapter. */
+:root{font-family:'DM Sans',sans-serif;--blue:#dc663c;--ink:#432c2a;--violet:#cf7952;--mint:#6a9a78}
+h1,h2,h3,.brand>span,.card-copy>strong,.takeaway,.transition strong{font-family:'Manrope',sans-serif}
+body{background:#f7e9d4;color:var(--ink)}
+.header{background:#fff4e5;border-bottom:1px solid #dbbda3;box-shadow:0 6px 20px #6b3e2420}
+.brand-worlds,.nav-link,.header-progress span{color:#785b4f}
+.nav-link.active:after{background:#dc663c}
+.header-progress{background:#fffaf0;border:1px solid #e6c8ad;color:#643f32}
+main{background:radial-gradient(ellipse at 68% 40%,#ffdfb7 0%,#f7e9d4 47%,#efd2b4 100%)}
+main:before,main:after{opacity:.2;background:radial-gradient(circle,transparent 48%,#d5926b 49% 50%,transparent 51%)}
+.sky-grain{opacity:.12}
+.eyebrow,.world-kicker,.selector-heading>span:first-child{color:#a45c3f}
+.live-dot{background:#e98755;box-shadow:0 0 0 5px #e9875529}
+.hero h1{color:#4e302b;letter-spacing:-3.7px}
+.hero h1>span{background:none;color:#dc663c}
+.hero>p,.hero-note,.hero-bottom,.hero-bottom strong{color:#785a50}
+.primary-button,.primary-button:hover{background:#da6139;border-color:#bd4b2b;color:#fffaf0;box-shadow:0 6px 0 #a94729,0 13px 22px #83412838}
+.primary-button:hover{background:#ec744a;transform:translateY(-3px);box-shadow:0 9px 0 #a94729,0 17px 24px #83412838}
+.primary-button:before{display:none}
+.button-arrow{background:#ffffff24}
+.scene-caption,.map-compass{color:#9c6f59}
+.caption-line{background:#ba8e73}
+.island-label{background:#fff4e7e8;border:1px solid #ecc6a5;box-shadow:0 6px 0 #bb815a44;color:#744d3c}
+.island-label small{color:#9d745f}
+.label-number,.label-one .label-number{background:#f5d5b6;color:#a85837}
+.world-selector{background:#f7e3c7d9;border:1px solid #dfb38f;box-shadow:0 8px 0 #c38e6980;backdrop-filter:blur(10px)}
+.selector-heading>span:last-child{color:#966d58}
+.world-card,.world-card.hub{background:#fff8e9;border:1px solid #d6ac88;box-shadow:0 5px 0 #bc8e6c;border-radius:18px;color:#4e302b}
+.world-card:hover{border-color:#a66d4e;box-shadow:0 8px 0 #ae7856,0 14px 25px #75492f26}
+.world-card:after{display:none}
+.world-card.hub,.world-card.tensor,.world-card.one{border-left:1px solid #d6ac88}
+.card-illustration,.tensor .card-illustration,.one .card-illustration{background:#f1d3ae;color:#b6633f;border:1px solid #e1b58e}
+.card-kicker,.card-description,.card-status{color:#926b58}
+.card-status,.hub .card-status{background:#f3e1c8;color:#9c6043}
+.card-arrow{border-color:#d6ad88;color:#a96040}
+.footer{background:#f4dfc7;border-top:1px solid #d9b391;color:#926c59}
+.footer button{color:#8e563d}
+body[data-world=hub],body[data-world=tensor],body[data-world=one]{--world:#b55d3f}
+.world-info h1,.quest-card>strong{color:#4b302a}
+.world-info p,.quest-card>p,.back-map,.game-controls{color:#795e50}
+.world-pill,.quest-card,.minimap,.interaction,.icon-button{background:#fff5e6e8;border:1px solid #dbb792;box-shadow:0 5px 0 #b9896359;color:#694737}
+.minimap-island,body[data-world=tensor] .minimap-island{background:#b8c482;border-color:#ead3aa;box-shadow:0 0 0 1px #c99d77}
+.minimap-island:before{border-color:#f6e3b4}
+.minimap-building{background:#df9e71}
+.minimap-point{background:#edb254}.minimap-point.found{background:#74a486}
+.quest-star.collected,.journal-progress .icon{color:#de9655}
+.quest-star.collected .icon{fill:#f4c47b}
+.text-button{color:#ae5c3e}
+.portal-chip,.one-chip{background:#f2ddc6;color:#965d43}
+kbd{background:#fff5e7;color:#754e3c;border:1px solid #d9b490;box-shadow:0 2px 0 #d9b49080}
+.interaction kbd{background:#d85f36;border-color:#b84a2a}
+.transition{background:#f2d4b9e9}.transition-star{color:#d66840}.transition p{color:#915f46}
+dialog{background:#fff8ed;border-color:#e4b894;color:#4b302a;box-shadow:0 20px 0 #9b674aa8,0 36px 90px #623d3066}
+dialog::backdrop{background:#54342a8a}
+.discovery-top,.discovery-top.one{background:radial-gradient(ellipse at center,#ffdda7,#d9976f)}
+.discovery-emblem,.one .discovery-emblem{background:linear-gradient(135deg,#fff0d4,#e3a876);color:#9e4e34;box-shadow:6px 8px 0 #995a3f7a;border-color:#fff0d4}
+.discovery-orbit,.one .discovery-orbit{border-color:#bd7554}
+.discovery-summary,.scenario p,.guide-content>p,.journal-header>p{color:#795d50}
+.scenario,.guide-keys{background:#f7e6d0;border-color:#e9c8a9}
+.scenario>span,.takeaway{color:#a45c3f}
+.chapter-steps{position:absolute;top:27px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;padding:8px 10px;background:#fff4e8df;border:1px solid #dbb792;border-radius:100px;box-shadow:0 4px 0 #be8b6754;font-size:8px;font-weight:700;letter-spacing:.25px;color:#aa8a78;white-space:nowrap}
+.chapter-steps span{padding:5px 8px;border-radius:100px}
+.chapter-steps .step-done{background:#f2d5b8;color:#9d5839}
+.chapter-steps .step-current{background:#d9653c;color:#fff9ee}
+@media(max-width:1150px){.chapter-steps{top:108px;left:50%;font-size:7px}}
+@media(max-width:800px){.chapter-steps{top:auto;bottom:21px;left:50%;gap:0;padding:5px}.chapter-steps span{padding:4px 5px;font-size:6px}}
+@media(max-width:520px){.hero h1{letter-spacing:-2.6px}.chapter-steps{top:330px;bottom:auto;left:5%;transform:none;max-width:90%;overflow:hidden}.chapter-steps span{font-size:6px}.quest-card{background:#fff5e6d9}.touch-jump{background:#d9653c}.dpad button{background:#fff5e6;border-color:#d9b490;color:#875c48}}

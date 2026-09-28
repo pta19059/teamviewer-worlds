@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { WORLDS, DISCOVERIES, clampToIsland } from './data.js';
 import { OBSTACLES, findRoute } from './navigation.js';
-import { addLandscape } from './landscape.js?v=fantasy-landscapes-2';
+import { addLandscape } from './landscape.js?v=clay-worlds-1';
 
 const TAU = Math.PI * 2;
 const materials = new Map();
@@ -124,75 +124,48 @@ function createTia() {
 }
 function island(id) {
   const w = WORLDS[id], g = new THREE.Group(), r = w.radius;
+  const accent = id === 'tensor' ? '#347ac2' : id === 'one' ? '#318f75' : '#d56c3d';
   g.position.fromArray(w.center); g.userData.world = id;
-  const surface = id === 'tensor' ? '#d0e5f3' : id === 'one' ? '#78c8a0' : '#91cf64';
-  cylinder(g, id === 'tensor' ? '#779ac5' : '#b99168', 0, -2.7, 0, r * .96, r * .67, 5, 12);
-  cylinder(g, id === 'tensor' ? '#a8c6e0' : '#d5b58b', 0, -.95, 0, r, r * .96, 1.5, 48);
-  cylinder(g, surface, 0, -.12, 0, r, r, .4, 64);
-  const rock = mesh(new THREE.IcosahedronGeometry(r * .62, 0), id === 'tensor' ? '#91accb' : '#b8a38a', g, 0, -5, 0); rock.scale.set(1, .6, 1); rock.rotation.y = .2;
+  // A shared clay stage gives every chapter the same silhouette and walking route.
+  cylinder(g, '#8a624d', 0, -2.7, 0, r * .96, r * .67, 5, 12);
+  cylinder(g, '#b98463', 0, -.95, 0, r, r * .96, 1.5, 48);
+  cylinder(g, '#b7c681', 0, -.12, 0, r, r, .4, 64);
+  const rock = mesh(new THREE.IcosahedronGeometry(r * .62, 0), '#9b7058', g, 0, -5, 0);
+  rock.scale.set(1, .6, 1); rock.rotation.y = .2;
   for (let i = 0; i < 13; i++) {
-    const a = i / 13 * TAU; const x = Math.cos(a) * (r - .7), z = Math.sin(a) * (r - .7);
-    ball(g, surface, x, -.07, z, .7, .22, .72);
-    if (i % 3 === 0) { const stone = mesh(new THREE.DodecahedronGeometry(.6, 0), id === 'tensor' ? '#b9d3ed' : '#c4bfa3', g, x * .95, .28, z * .95); stone.scale.y = .6; }
-  }
-  const path = ring(g, id === 'tensor' ? '#f7fcff' : '#f7e8bd', id === 'hub' ? 6 : 8, .62, 0, .075, 0); path.rotation.x = Math.PI / 2; path.scale.z = .13;
-  if (id === 'hub') {
-    cylinder(g, '#fff1cf', 0, .08, 0, 4.5, 4.5, .14);
-    // Mushroom observatory: rounded plaster, striped cap, windows, arched entrance.
-    cylinder(g, '#f7fcff', 0, 2.3, -3, 2.7, 3, 4.6);
-    ball(g, '#6c8ef0', 0, 5, -3, 4.4, 2.1, 4.3);
-    cylinder(g, '#bed7ff', 0, 4.52, -3, 4.15, 4.1, .25);
-    box(g, '#4d7fe5', 0, 1.05, -.2, 1.3, 2.1, .18, .6);
-    ball(g, '#b6f0e3', .38, 1.03, -.08, .08);
-    // Keep the welcome sign beyond the roof's footprint so it is legible from the player camera.
-    const welcomeSign = sign(g, 'LET’S CONNECT', 0, 3.05, .95, '#886943', 3.7);
-    welcomeSign.renderOrder = 2;
-    [-1, 1].forEach(s => { const win = ring(g, '#b9d7ff', .48, .11, s * 1.65, 2.9, -.78); win.rotation.y = s * .38; ball(g, '#86c5f5', s * 1.65, 2.9, -.78, .45, .45, .11); });
-    tree(g, -8, 2, 1.3); tree(g, 7, 6, .8); tree(g, -6, -7, .7);
-    tree(g, 7, -6, 1.4); tree(g, -8, -4, 1.2); tree(g, 3, -9, .95);
-    for (const [x,z] of [[-9,7],[-4,9],[8,8],[10,-4],[-10,-6]]) flower(g,x,z,'#f5a4c8');
-    critter(g,-8,6,'#e8b46b',.7); critter(g,8,-8,'#f2d4a3',.58);
-    pipe(g, -5.8, 1, '#2daf89');
-    box(g, '#dcaa68', 6, 1.15, 1, 1.65, 1.65, 1.65);
-    const q = sign(g, '?', 6, 1.16, 1.84, '#fff6d7', 1.1); q.material.map = labelTexture('?', '#fff6d7', null, 100);
-  } else if (id === 'tensor') {
-    cylinder(g, '#d1e0f1', 0, .22, -1, 4.2, 4.6, .5);
-    box(g, '#f9fcff', 0, 2.6, -2, 5.6, 4.9, 3.9, .3);
-    box(g, '#8eb5e5', 0, 5.13, -2, 6, .38, 4.3);
-    for (const s of [-1, 1]) {
-      cylinder(g, '#e6f1ff', s * 3.4, 3.2, -1.7, 1.25, 1.4, 6.4, 12);
-      mesh(new THREE.ConeGeometry(1.7, 2.4, 12), '#4896ef', g, s * 3.4, 7.55, -1.7);
-      box(g, '#74b7ed', s * 3.4, 3.5, -.47, .45, 1.1, .08);
-      cylinder(g, '#d3e5f7', s * 3.4, 6.3, -1.7, 1.43, 1.43, .32, 12);
+    const a = i / 13 * TAU, x = Math.cos(a) * (r - .7), z = Math.sin(a) * (r - .7);
+    ball(g, '#b7c681', x, -.07, z, .7, .22, .72);
+    if (i % 3 === 0) {
+      const stone = mesh(new THREE.DodecahedronGeometry(.6, 0), '#d2a681', g, x * .95, .28, z * .95);
+      stone.scale.y = .6;
     }
-    box(g, '#558ddd', 0, 1.25, .01, 1.5, 2.5, .2, .7);
-    sign(g, 'TENSOR', 0, 4.25, .04, '#2465c7', 4.3);
-    const emblem = ring(g, '#80c7fc', .85, .13, 0, 7.1, -2);
-    mesh(starGeometry(.66, .16), '#ffdc7c', g, 0, 7.1, -1.95);
-    cylinder(g, '#b8cde7', 0, 5.8, -2, .08, .08, 2.4);
-    const moat = ring(g, '#64c6ef', 4.15, .34, 0, .16, -2); moat.rotation.x = Math.PI / 2; moat.material = mat('#64c6ef', { emissive: '#278fbd', emissiveIntensity: .12, roughness: .32 });
-    for (const [x,z] of [[-11,-8],[-12,-3],[-11,3],[-9,8],[10,-8],[11,-3],[11,4],[8,8]]) pine(g,x,z,.75+((x+z)%3)*.12);
-    for (const [x,z] of [[-7,8],[8,8],[-12,0]]) critter(g,x,z,'#b8d9ee',.72);
-    pine(g,-10,-6,1.1); pine(g,9,-7,1.2); pine(g,1,-11,.9); pine(g,-10,5,.7);
-    pipe(g,10,1,'#589ede',.8);
-  } else {
-    cylinder(g, '#e5f8e9', 0, .24, -2, 4.1, 4.6, .5);
-    cylinder(g, '#f7fff9', 0, 2.2, -2, 2.9, 3.2, 4);
-    cylinder(g, '#54b69b', 0, 3.3, -2, 3.04, 3.04, .2);
-    ball(g, '#a3e8d3', 0, 4.1, -2, 3.35, 2.1, 3.35);
-    for (let i=0;i<6;i++) { const a=i/6*TAU; box(g,'#62bea9',Math.sin(a)*3.17,2,Math.cos(a)*3.17-2,.58,1.7,.18,.2).rotation.y=a; }
-    const orbit = ring(g, '#ffda82', 3.9, .09, 0, 6, -2); orbit.rotation.x = 1.17; orbit.rotation.z = .3;
-    ball(g, '#ffc660', 3.3, 7.12, -1.2, .37);
-    sign(g, 'ONE', 0, 3.5, 1.46, '#12886e', 3.4);
-    box(g, '#58baa7', 0, 1.1, 1.24, 1.2, 2.1, .16, .55);
-    tree(g,-10,-6,1.35,'#64c5a6'); tree(g,9,-6,1.3,'#8abe65'); tree(g,0,-11,1,'#70bd91');
-    for (const [x,z,c] of [[-11,3,'#68c6ad'],[-8,8,'#95d078'],[8,8,'#64c5a6'],[11,2,'#93d47f'],[7,-10,'#62bfa4']]) tree(g,x,z,.78,c);
-    critter(g,-9,6,'#f3d3a5',.62); critter(g,9,6,'#d9b2e7',.57);
-    tree(g,10,1,.58,'#8fcf88'); pipe(g,-10,1,'#2cad8d',.8);
   }
-  const beaconColor = id === 'tensor' ? '#6baef5' : id === 'one' ? '#60cfaa' : '#ffd16b';
-  for (let i = 0; i < 4; i++) { const a = i / 4 * TAU + .42; beacon(g, Math.cos(a) * (r - 2.25), Math.sin(a) * (r - 2.25), beaconColor, .72 + (i % 2) * .12); }
-  for (let i = 0; i < 22; i++) { const a = i * 2.399; const radius = r - 1.6 - (i % 3) * .55; flower(g, Math.cos(a)*radius,Math.sin(a)*radius,id==='tensor'?'#cadbff':i%2?'#fff6d3':'#f4aab8'); }
+  const path = ring(g, '#f6d9aa', id === 'hub' ? 6 : 8, .62, 0, .075, 0);
+  path.rotation.x = Math.PI / 2; path.scale.z = .13;
+  cylinder(g, '#e8cfa8', 0, .08, -2, 4.55, 4.55, .16);
+  cylinder(g, '#f2dfbf', 0, 2.25, -2, 2.8, 3, 4.5);
+  ball(g, '#df774f', 0, 4.95, -2, 3.85, 1.75, 3.85);
+  cylinder(g, '#f4b078', 0, 4.6, -2, 3.8, 3.8, .22);
+  box(g, accent, 0, 1.15, .88, 1.25, 2.15, .2, .42);
+  sign(g, id === 'hub' ? 'WELCOME' : id === 'tensor' ? 'TENSOR' : 'ONE', 0, 3.15, 1.04, '#7d472f', 3.75);
+  for (const side of [-1, 1]) {
+    const window = ring(g, '#fff0d4', .48, .11, side * 1.7, 2.85, -.65);
+    window.rotation.y = side * .38;
+    ball(g, accent, side * 1.7, 2.85, -.65, .4, .4, .1);
+  }
+  for (const [x, z, scale] of [[-10,-6,1.2],[10,-6,1.1],[-10,5,.8],[10,6,.9],[0,-11,.9]])
+    tree(g, x, z, scale, '#789f70');
+  mushroom(g, -12, -3, .85, '#dc785d'); mushroom(g, 11, 3, .7, '#dc785d');
+  critter(g, -8, 7, '#d8a477', .62); critter(g, 8, -8, '#d8a477', .58);
+  pipe(g, id === 'hub' ? -5.8 : 10, 1, '#579781', .8);
+  for (let i = 0; i < 4; i++) {
+    const a = i / 4 * TAU + .42;
+    beacon(g, Math.cos(a) * (r - 2.25), Math.sin(a) * (r - 2.25), '#e9aa69', .72 + (i % 2) * .12);
+  }
+  for (let i = 0; i < 22; i++) {
+    const a = i * 2.399, radius = r - 1.6 - (i % 3) * .55;
+    flower(g, Math.cos(a) * radius, Math.sin(a) * radius, i % 2 ? '#fff0c8' : '#df9a82');
+  }
   return g;
 }
 
@@ -203,7 +176,7 @@ export class WorldScene {
     this.mapOrbitYaw=Math.atan2(23,90);this.mapOrbitPitch=Math.asin(44/Math.hypot(23,44,90));this.mapOrbitDistance=Math.hypot(23,44,90);this.drag=null;
     this.active = 'map'; this.keys = new Set(); this.stations = []; this.portals = []; this.clouds = []; this.particles = []; this.elapsed = 0; this.paused = false; this.jumpY = 0; this.velocityY = 0; this.moveTarget = null; this.waypoints = []; this.pendingStation = null; this.nearest = null; this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog('#e7f0fa', 100, 235);
+    this.scene.fog = new THREE.Fog('#f5d8bd', 100, 235);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75)); this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1;
@@ -213,9 +186,9 @@ export class WorldScene {
     this.renderer.domElement.style.touchAction='pan-y';
     this.camera = new THREE.PerspectiveCamera(37, 1, .1, 350);
     this.camTarget = new THREE.Vector3(0, 0, -7); this.camPos = new THREE.Vector3(23, 44, 83); this.camera.position.copy(this.camPos); this.camera.lookAt(this.camTarget);
-    this.scene.add(new THREE.HemisphereLight('#e5f4ff', '#a0a6bc', 1.8));
+    this.scene.add(new THREE.HemisphereLight('#fff0dc', '#aa796a', 1.8));
     const sun = new THREE.DirectionalLight('#fff1d9', 2.8); sun.position.set(-28, 65, 35); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left=-70; sun.shadow.camera.right=70; sun.shadow.camera.top=55; sun.shadow.camera.bottom=-55; sun.shadow.normalBias=.05; sun.shadow.bias=-.0003; this.scene.add(sun);
-    const fill = new THREE.DirectionalLight('#b9dcff', .8); fill.position.set(35,20,-45); this.scene.add(fill);
+    const fill = new THREE.DirectionalLight('#f7c6a4', .8); fill.position.set(35,20,-45); this.scene.add(fill);
     this.worldGroups = {}; this.landscapes = [];
     Object.keys(WORLDS).forEach(id => {
       const g = island(id); this.scene.add(g); this.worldGroups[id] = g;
@@ -225,12 +198,12 @@ export class WorldScene {
     this.shadow = new THREE.Mesh(new THREE.CircleGeometry(.72, 24), new THREE.MeshBasicMaterial({color:'#2c5460',opacity:.14,transparent:true,depthWrite:false})); this.shadow.rotation.x=-Math.PI/2; this.scene.add(this.shadow);
     DISCOVERIES.forEach((data,i) => {
       const g = new THREE.Group(); const [x,z] = data.position; g.position.set(x,0,z); this.worldGroups[data.world].add(g);
-      cylinder(g, data.world==='tensor'?'#a3c7e9':'#c0e7ba',0,.14,0,1.1,1.2,.25);
+      cylinder(g, '#bd9273',0,.14,0,1.1,1.2,.25);
       cylinder(g,'#fff7e2',0,.36,0,.86,1,.28);
       const cube = box(g,this.collected.has(data.id)?'#6ac39d':'#fbc75e',0,1.65,0,1.12,1.12,1.12,.12);
       const face = new THREE.Mesh(new THREE.PlaneGeometry(.72,.72),new THREE.MeshBasicMaterial({map:glyphTexture(this.collected.has(data.id)?'✓':'?','#fff9e6'),transparent:true}));face.position.set(0,0,.57);cube.add(face);
       const face2 = face.clone();face2.rotation.y=Math.PI/2;face2.position.set(.57,0,0);cube.add(face2);
-      const halo = ring(g,data.world==='tensor'?'#61a6ed':'#53bb98',.8,.035,0,1.6,0);halo.rotation.x=Math.PI/2;
+      const halo = ring(g,'#ef9b5e',.8,.035,0,1.6,0);halo.rotation.x=Math.PI/2;
       g.userData.discovery=data; cube.userData.discovery=data; face.userData.discovery=data; face2.userData.discovery=data;
       this.stations.push({group:g,cube,halo,data,base:1.65,phase:i*.8,faces:[face,face2]});
     });

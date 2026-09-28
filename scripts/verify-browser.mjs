@@ -49,10 +49,12 @@ try {
   await b.screenshot('journal.png');await b.click('#dialog-close');
   await b.send('Page.reload'); await b.until(`document.body.classList.contains('loaded')`,25000);
   check('Progress survives a page reload', await b.evaluate(`document.getElementById('total-count').textContent === '12'`));
+  await b.click('#start'); await b.until(`document.body.dataset.world === 'hub' && document.getElementById('transition').classList.contains('hidden')`);
   await b.click('#sound'); check('The sound toggle is interactive', await b.evaluate(`document.getElementById('sound').getAttribute('aria-label') === 'Mute sound'`));
   await b.click('#nav-guide'); check('The guide opens with English instructions', await b.evaluate(`document.getElementById('dialog-title').textContent === 'Curiosity isyour superpower.'`));
   await b.send('Input.dispatchKeyEvent', { type:'keyDown', key:'Escape', code:'Escape', windowsVirtualKeyCode:27 });
   await b.send('Input.dispatchKeyEvent', { type:'keyUp', key:'Escape', code:'Escape', windowsVirtualKeyCode:27 }); await b.until(`!document.querySelector('dialog').open`);
+  await b.click('#back-map');
   await b.send('Emulation.setDeviceMetricsOverride', { width:390,height:844,deviceScaleFactor:1,mobile:true });
   await b.send('Emulation.setTouchEmulationEnabled', { enabled:true,maxTouchPoints:5 }); await wait(1500);
   check('Mobile layout has no horizontal overflow', await b.evaluate(`document.documentElement.scrollWidth <= innerWidth`));

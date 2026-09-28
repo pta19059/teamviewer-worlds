@@ -61,9 +61,9 @@ function batchScenery(root) {
 }
 
 const palettes = {
-  hub: { grass: '#62ab45', light: '#a4d564', rock: '#9b7455', strata: '#d8af72', flower: '#ff7caa', crystal: '#a488ff', water: '#4bbfe0' },
-  tensor: { grass: '#99bed6', light: '#eff8ff', rock: '#637f9e', strata: '#abcce3', flower: '#8a9fea', crystal: '#62d8ff', water: '#68c9f0' },
-  one: { grass: '#369878', light: '#84d4a1', rock: '#758c7d', strata: '#b4cba0', flower: '#f496cd', crystal: '#79efd0', water: '#3ebdc1' },
+  hub: { grass: '#7ca66e', light: '#b7c681', rock: '#956d58', strata: '#c99b78', flower: '#e88d73', crystal: '#eeb16f', water: '#75b8bb' },
+  tensor: { grass: '#7ca66e', light: '#b7c681', rock: '#956d58', strata: '#c99b78', flower: '#e88d73', crystal: '#eeb16f', water: '#75b8bb' },
+  one: { grass: '#7ca66e', light: '#b7c681', rock: '#956d58', strata: '#c99b78', flower: '#e88d73', crystal: '#eeb16f', water: '#75b8bb' },
 };
 
 function crystalCluster(parent, x, y, z, scale, color) {
@@ -150,10 +150,9 @@ function cliffDetails(parent, id, random) {
   // Silhouettes on the rear rim create depth without covering the discovery routes.
   for (let i = 0; i < 7; i++) {
     const angle = Math.PI * 1.13 + i * .115, r = radius + .35;
-    const height = (id === 'tensor' ? 4 : 1.8) + random() * 2.5;
-    piece(parent, id === 'tensor' ? 'cone' : 'sphere', i % 2 ? p.light : p.grass,
+    const height = 1.8 + random() * 2.5;
+    piece(parent, 'sphere', i % 2 ? p.light : p.grass,
       [Math.cos(angle) * r, height * .34, Math.sin(angle) * r], [1.8, height, 1.5]);
-    if (id === 'tensor') piece(parent, 'cone', '#f3fbff', [Math.cos(angle) * r, height * .77, Math.sin(angle) * r], [.77, height * .4, .65]);
   }
 }
 
@@ -167,7 +166,7 @@ function groundDetails(parent, id, random) {
   };
   for (let i = 0; i < 64; i++) {
     const a = i * TAU / 64, x = Math.cos(a) * pathRadius, z = Math.sin(a) * pathRadius;
-    const stone = piece(parent, 'cube', i % 3 ? (id === 'tensor' ? '#e2f0f9' : '#edd8ab') : '#fff0d0', [x, .13, z], [.67, .07, .86]);
+    const stone = piece(parent, 'cube', i % 3 ? ('#edd8ab') : '#fff0d0', [x, .13, z], [.67, .07, .86]);
     stone.rotation.y = -a;
   }
   for (let i = 0; i < 145; i++) {
@@ -182,14 +181,14 @@ function groundDetails(parent, id, random) {
       for (let j = 0; j < 5; j++) piece(parent, 'sphere', i % 2 ? p.flower : '#fff3bd', [x + Math.cos(j * TAU / 5) * .13, .46, z + Math.sin(j * TAU / 5) * .13], [.12, .06, .12]);
       piece(parent, 'sphere', '#ffc453', [x, .5, z], [.07, .05, .07]);
     }
-    if (i % 13 === 0 && r > w.radius - 3 && clear(x, z, 3.3)) toadstool(parent, x, z, .4 + random() * .25, id === 'tensor' ? '#829ef0' : '#ef817f');
+    if (i % 13 === 0 && r > w.radius - 3 && clear(x, z, 3.3)) toadstool(parent, x, z, .4 + random() * .25, '#df8268');
   }
   // Small stepping stones lead toward the actual interactive golden blocks.
   for (const d of DISCOVERIES.filter(d => d.world === id)) {
     const [x, z] = d.position, distance = Math.hypot(x, z);
     for (let i = 0; i < 4; i++) {
       const r = pathRadius + i * (distance - pathRadius - 1.4) / 4;
-      piece(parent, 'rock', id === 'tensor' ? '#f4fbff' : '#f8e4bb', [x / distance * r, .12, z / distance * r], [.35, .075, .26]).rotation.y = i;
+      piece(parent, 'rock', '#f8e4bb', [x / distance * r, .12, z / distance * r], [.35, .075, .26]).rotation.y = i;
     }
   }
 }
@@ -267,71 +266,33 @@ function ornaments(parent, id, floats) {
 
 function landmarks(parent, animated, id, floats) {
   const p = palettes[id];
-  if (id === 'hub') {
-    toadstool(parent, -13, -6, 1.9, '#e95b60');
-    toadstool(parent, -11.7, -7.8, .95, '#f5b84e');
-    toadstool(parent, 12.8, 6.4, 1.3, '#ee7166');
-    toadstool(parent, 11.3, 8.1, .68, '#f6be54');
-    blossomTree(parent, 6, -13, .78, '#f3b0c0');
-    ruins(parent, -1, -14.3, .72, p.crystal, true);
-    // Chunky suspended platform blocks with raised golden studs.
-    for (let i = 0; i < 3; i++) {
-      const x = -7.5 + i * 1.25, y = 2.4 + Math.sin(i * 1.2) * .6;
-      piece(parent, 'cube', i === 1 ? '#f7c258' : '#be8255', [x, y, -11.5], [1.05, 1.05, 1.05]);
-      if (i === 1) piece(parent, 'crystal', '#fff6cf', [x, y, -10.95], [.23, .32, .065], .13);
-      else for (const side of [-1, 1]) piece(parent, 'cube', '#e8b17b', [x, y + side * .23, -10.96], [.97, .04, .02]);
-    }
-    crystalCluster(parent, 12, .1, -8.7, .72, p.crystal);
-    floatingIsle(animated, id, -1.6, .6, floats);
-  } else if (id === 'tensor') {
-    crystalCluster(parent, -15.2, .1, 4, 1.2, '#71d7ff');
-    crystalCluster(parent, 15.5, .1, -7, 1.55, '#a5a1ff');
-    crystalCluster(parent, 2, .1, -16, 1.1, '#73d8ec');
-    ruins(parent, -11.7, -12.3, .92, p.crystal);
-    ruins(parent, 13.9, 7.5, .6, p.crystal, true);
-    // Window mullions, battlements and banners enrich the existing fortress.
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < 4; i++) {
-        piece(parent, 'cube', '#d7e9fa', [side * 2.7, 5.48, -3.5 + i], [.48, .65, .5]);
-        piece(parent, 'cube', '#accbe8', [side * 3.4, 3.5 + (i - 1.5) * .22, -.405], [.48, .025, .03]);
-      }
-      beam(parent, '#c8ab78', [side * 2.15, 4.4, .12], [side * 2.15, 4.4, .9], .045);
-      piece(parent, 'cube', '#5679c5', [side * 2.15, 3.65, .9], [.65, 1.45, .07]);
-      piece(parent, 'crystal', '#f3dd9e', [side * 2.15, 3.72, .95], [.2, .34, .035], .1);
-    }
-    floatingIsle(animated, id, -2.15, .72, floats);
-  } else {
-    blossomTree(parent, -15, -6.8, 1.1, '#d1a1de');
-    blossomTree(parent, 14.4, 7.8, .88, '#f2b7d1');
-    blossomTree(parent, 9.7, -13.6, .82, '#e4a6db');
-    ruins(parent, -.7, -16, 1, p.crystal);
-    crystalCluster(parent, -13.7, .1, 8.9, .8, p.crystal);
-    crystalCluster(parent, 15.7, .1, -5.8, .85, '#c0adff');
-    // Petalled copper canopy around the garden observatory.
-    for (let i = 0; i < 10; i++) {
-      const a = i * TAU / 10;
-      const petal = piece(parent, 'ring', '#ead5a2', [Math.cos(a) * 1.85, 4.15, -2 + Math.sin(a) * 1.85], [1.4, 2.15, 1.4]);
-      petal.rotation.set(.5, a, .6);
-    }
-    toadstool(parent, 4.8, -15.8, 1.15, '#aa89d0');
-    floatingIsle(animated, id, 2, .7, floats);
+  // Shared landmarks and positions keep the visual rhythm consistent in every world.
+  toadstool(parent, -13, -6, 1.15, '#db7359');
+  toadstool(parent, 12.8, 6.4, .9, '#e4a767');
+  blossomTree(parent, 10, -11, .72, '#df9b81');
+  ruins(parent, -1, -14.3, .72, p.crystal, true);
+  crystalCluster(parent, 12, .1, -8.7, .72, p.crystal);
+  for (let i = 0; i < 3; i++) {
+    const x = -7.5 + i * 1.25, y = 2.4 + Math.sin(i * 1.2) * .6;
+    piece(parent, 'cube', i === 1 ? '#e9ad67' : '#bf8262', [x, y, -11.5], [1.05, 1.05, 1.05]);
   }
+  floatingIsle(animated, id, -1.6, .6, floats);
   ornaments(animated, id, floats);
 }
 
 function motes(parent, id, random, uniforms) {
-  const count = id === 'tensor' ? 115 : 65, positions = [], phases = [], colors = [], p = palettes[id];
+  const count = 65, positions = [], phases = [], colors = [], p = palettes[id];
   for (let i = 0; i < count; i++) {
     const a = random() * TAU, r = 6 + random() * (WORLDS[id].radius - 6);
     positions.push(Math.cos(a) * r, .7 + random() * 5.5, Math.sin(a) * r);
     phases.push(random() * TAU);
-    colors.push(...new THREE.Color(id === 'tensor' ? '#f6fcff' : i % 3 ? '#ffe6a2' : p.flower).toArray());
+    colors.push(...new THREE.Color(i % 3 ? '#ffe6a2' : p.flower).toArray());
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setAttribute('phase', new THREE.Float32BufferAttribute(phases, 1));
   geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  const particleUniforms = { time: { value: 0 }, snow: { value: id === 'tensor' ? 1 : 0 } };
+  const particleUniforms = { time: { value: 0 }, snow: { value: 0 } };
   const shader = new THREE.ShaderMaterial({
     uniforms: particleUniforms, vertexColors: true, transparent: true, depthWrite: false,
     vertexShader: `uniform float time; uniform float snow; attribute float phase; varying vec3 vColor; varying float vAlpha;
@@ -366,8 +327,7 @@ export function addLandscape(parent, id) {
   cliffDetails(staticRoot, id, random);
   groundDetails(staticRoot, id, random);
   landmarks(staticRoot, animated, id, floats);
-  waterfall(animated, staticRoot, id, id === 'tensor' ? .7 : -.85, id === 'one' ? 1.25 : .95, uniforms);
-  if (id === 'one') waterfall(animated, staticRoot, id, 1.17, .65, uniforms);
+  waterfall(animated, staticRoot, id, -.85, .95, uniforms);
   motes(animated, id, random, uniforms);
   batchScenery(staticRoot);
   return {
