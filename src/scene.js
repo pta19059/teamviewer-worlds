@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { WORLDS, DISCOVERIES, clampToIsland } from './data.js';
 import { OBSTACLES, findRoute } from './navigation.js';
-import { addLandscape } from './landscape.js?v=clay-worlds-1';
+import { addLandscape } from './landscape.js?v=clay-controls-2';
 
 const TAU = Math.PI * 2;
 const materials = new Map();
@@ -280,9 +280,10 @@ export class WorldScene {
   }
   jump() {if(this.active==='map'||this.paused)return;if(this.jumpY<=.001){this.velocityY=7.8;this.callbacks.sound('jump');}}
   interact() {
-    if(this.paused)return;
+    if(this.paused || this.active==='map')return;
     if(this.nearest?.type==='discovery')this.callbacks.discover(this.nearest.data);
     else if(this.nearest?.type==='portal')this.callbacks.travel(this.nearest.target);
+    else this.callbacks.hint?.('Move closer to a golden block or portal, then press E or click Discover.');
   }
   pointerDown(e) {
     if(this.paused)return;

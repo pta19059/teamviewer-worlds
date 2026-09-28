@@ -43,7 +43,7 @@ app.innerHTML = `
       <aside class="quest-card" id="quest-card"><div class="quest-heading">${icon('flag')} YOUR MISSION</div><strong id="quest-title"></strong><p id="quest-description"></p><div class="quest-track" id="quest-track"></div><button class="text-button" id="next-discovery">Find my next discovery ${icon('arrow-right')}</button></aside>
       <div class="minimap" id="minimap" aria-label="Island map"><div class="minimap-top"><span>YOUR ISLAND</span>${icon('compass')}</div><div class="minimap-island" id="minimap-island"><span class="minimap-building"></span><span class="minimap-player" id="minimap-player"></span></div><span class="minimap-legend"><i></i> TIA <i></i> Discovery</span></div>
       <button class="interaction hidden" id="interaction"><kbd>E</kbd><span id="interaction-text"></span>${icon('arrow-right')}</button>
-      <div class="game-controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>SPACE</kbd> Jump</span><span><kbd>E</kbd> Discover</span><span class="click-hint">${icon('mouse-pointer-2')} Click to move</span></div>
+      <div class="game-controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>SPACE</kbd> Jump</span><button id="discover-action" type="button" title="Move near a golden block or portal, then press E or click here." aria-label="Discover a nearby block or enter a portal (E)"><kbd>E</kbd> Discover</button><span class="click-hint">${icon('mouse-pointer-2')} Click to move</span></div>
       <div class="touch-controls" aria-label="Touch controls"><div class="dpad"><button data-key="ArrowUp" aria-label="Move forward">${icon('chevron-up')}</button><button data-key="ArrowLeft" aria-label="Move left">${icon('chevron-left')}</button><button data-key="ArrowDown" aria-label="Move backward">${icon('chevron-down')}</button><button data-key="ArrowRight" aria-label="Move right">${icon('chevron-right')}</button></div><button class="touch-jump" id="touch-jump">Jump ${icon('chevron-up')}</button></div>
     </section>
     <div class="utility-controls"><button class="icon-button" id="sound" aria-label="Enable sound" title="Enable sound">${icon('volume-x')}</button><button class="icon-button" id="fullscreen" aria-label="Full screen" title="Full screen">${icon('maximize')}</button></div>
@@ -111,8 +111,20 @@ function openDialog(html,wide=false) {
   lastFocus=document.activeElement;scene?.setPaused(true);$('dialog-content').innerHTML=html;$('dialog').classList.toggle('wide',wide);
   if(!$('dialog').open)$('dialog').showModal();$('dialog-close').focus();
 }
-function closeDialog() { if($('dialog').open)$('dialog').close(); }
-$('dialog').addEventListener('close',()=>{scene?.setPaused(false);activeDiscovery=null;const returnToWorld=currentWorld!=='map'&&(lastFocus===scene?.renderer.domElement||lastFocus?.matches?.('.minimap-point'));if(returnToWorld)scene.renderer.domElement.focus({preventScroll:true});else if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});});
+function resumeAfterDialog() {
+  // A queued close event must not resume a newer dialog or an ongoing transition.
+  if($('dialog').open || !$('transition').classList.contains('hidden'))return;
+  scene?.setPaused(false);activeDiscovery=null;
+  const returnToWorld=currentWorld!=='map'&&(lastFocus===scene?.renderer.domElement||lastFocus?.matches?.('.minimap-point'));
+  if(returnToWorld)scene.renderer.domElement.focus({preventScroll:true});
+  else if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});
+}
+function closeDialog() {
+  if(!$('dialog').open)return;
+  $('dialog').close();resumeAfterDialog();
+}
+$('dialog').addEventListener('close',resumeAfterDialog);
+$('dialog').addEventListener('cancel',event=>{event.preventDefault();closeDialog();});
 $('dialog').addEventListener('click',e=>{if(e.target===$('dialog')){const r=$('dialog').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog();}});
 $('dialog-close').onclick=closeDialog;
 function discover(data,fromJournal=false) {
@@ -145,6 +157,7 @@ $('start').onclick=()=>travel('hub');document.querySelectorAll('[data-travel]').
 $('brand').onclick=showMap;$('nav-map').onclick=showMap;$('back-map').onclick=showMap;
 $('nav-journal').onclick=journal;$('progress-button').onclick=journal;$('fallback-journal').onclick=journal;$('nav-guide').onclick=guide;$('sources').onclick=sources;
 $('interaction').onclick=()=>scene?.interact();$('touch-jump').onclick=()=>scene?.jump();$('retry').onclick=()=>location.reload();
+$('discover-action').onclick=()=>scene?.interact();
 $('next-discovery').onclick=()=>{const next=DISCOVERIES.find(d=>d.world===currentWorld&&!progress.includes(d.id));if(next){scene.walkTo(next);toast('Follow TIA to the next discovery.');return;}const nextWorld=['tensor','one'].find(id=>worldProgress(progress,id)<6);if(nextWorld)travel(nextWorld);else journal();};
 $('sound').onclick=()=>{soundEnabled=!soundEnabled;$('sound').innerHTML=icon(soundEnabled?'volume-2':'volume-x');$('sound').setAttribute('aria-label',soundEnabled?'Mute sound':'Enable sound');$('sound').title=soundEnabled?'Mute sound':'Enable sound';if(soundEnabled)sound('collect');};
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('Full screen is unavailable in this browser.');}};
@@ -154,8 +167,8 @@ updateProgress();
 
 async function init() {
   try {
-    const { WorldScene } = await import('./scene.js?v=clay-worlds-1');
-    scene=new WorldScene($('scene'),{travel,discover,near:showNear,sound,position:updateMinimap,labels:updateWorldLabels},progress);
+    const { WorldScene } = await import('./scene.js?v=clay-controls-2');
+    scene=new WorldScene($('scene'),{travel,discover,near:showNear,sound,hint:toast,position:updateMinimap,labels:updateWorldLabels},progress);
     $('start').innerHTML=`Start exploring <span class="button-arrow">${icon('arrow-right')}</span>`;$('start').disabled=false;
     document.querySelectorAll('[data-travel]').forEach(el=>el.disabled=false);document.body.classList.add('loaded');
     scene.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();toast('3D graphics were interrupted. Reload to resume. Your discoveries are saved.');});

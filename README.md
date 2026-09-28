@@ -18,7 +18,7 @@ Open **http://localhost:5173**. Alternatively, double-click `START.cmd` and leav
 - Move with **WASD** or the **arrow keys**. Hold **Shift** to run and press **Space** to jump.
 - Walk to a portal and press **E** to travel. Clicking a portal also guides TIA to it.
 - Click a golden block, its minimap marker, or **Find my next discovery** to guide TIA around buildings automatically.
-- Press **E** near a block, read its product story, then choose **Collect discovery**.
+- Press **E** or click **Discover** near a block, read its product story, then choose **Collect discovery**. If no block or portal is in range, a hint explains how to approach one.
 - Drag the world to orbit the camera; scroll over it to zoom.
 - Press **M** for the world map or **Escape** to close a dialog / open the pause guide.
 - On touch screens, use the direction pad and **Jump**, or tap a destination. Drag to orbit.
@@ -62,6 +62,7 @@ The unit suite checks persistence recovery, unique progress, world boundaries, p
 node scripts/verify-browser.mjs
 node scripts/verify-interactions.mjs
 node scripts/verify-landscapes.mjs
+node scripts/verify-controls.mjs
 ```
 
 Chrome is detected in the per-user Windows installation. Set `CHROME_PATH` to another Chrome executable if necessary. Screenshots and test results are written to `artifacts/`. The test browser uses its own profile and does not use your normal Chrome session.

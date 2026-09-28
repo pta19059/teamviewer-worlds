@@ -108,6 +108,15 @@ dialog::backdrop{background:#54342a8a}
 .chapter-steps span{padding:5px 8px;border-radius:100px}
 .chapter-steps .step-done{background:#f2d5b8;color:#9d5839}
 .chapter-steps .step-current{background:#d9653c;color:#fff9ee}
+/* Keep the hero and world cards in separate rows, including short desktop windows. */
+body:not([data-mode=explore]) main{display:grid;grid-template-rows:minmax(min-content,1fr) auto;row-gap:36px;height:auto;min-height:max(780px,calc(100svh - 138px));max-height:none;padding-bottom:33px}
+body:not([data-mode=explore]) .world-selector{position:relative;inset:auto;margin:0 5%;align-self:end}
+.game-controls button{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:4px 9px;border:1px solid #d9b490;border-radius:8px;background:#fff5e7;color:#754e3c;font-size:inherit}
+.game-controls button:hover{background:#f7dfc0;border-color:#a96040}
+.toast{pointer-events:none}
+@media(max-height:830px) and (min-width:1000px){body:not([data-mode=explore]) main{min-height:max(680px,calc(100svh - 138px))}}
+@media(max-width:800px){body:not([data-mode=explore]) main{min-height:1080px;padding-bottom:28px}}
+@media(max-width:520px){body:not([data-mode=explore]) main{min-height:1110px;padding-bottom:23px}}
 @media(max-width:1150px){.chapter-steps{top:108px;left:50%;font-size:7px}}
 @media(max-width:800px){.chapter-steps{top:auto;bottom:21px;left:50%;gap:0;padding:5px}.chapter-steps span{padding:4px 5px;font-size:6px}}
 @media(max-width:520px){.hero h1{letter-spacing:-2.6px}.chapter-steps{top:330px;bottom:auto;left:5%;transform:none;max-width:90%;overflow:hidden}.chapter-steps span{font-size:6px}.quest-card{background:#fff5e6d9}.touch-jump{background:#d9653c}.dpad button{background:#fff5e6;border-color:#d9b490;color:#875c48}}
